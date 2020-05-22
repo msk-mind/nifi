@@ -4,7 +4,7 @@ build:
 
 
 ## run nifi lib container and copy libs to host system
-lib:
+lib: build
 	docker run -d --name nifi_lib nifi_lib:latest
 	docker cp nifi_lib:/nifi-dicom/build/libs/nifi-dicom-1.4.nar .
 	docker stop nifi_lib
