@@ -1,20 +1,20 @@
 # nifi
 
 
-Start nifi Server
+Start nifi server
     
 ```
     make run
 ```    
 
-Stop nifi Server
+Stop nifi server
 
 ```
     make clean
 ```    
 
 
-Once started, open webapp on browser at localhost:8080
+Once started, open webapp in browser at localhost:8080
 
 Add new template from Operator box on left
 
