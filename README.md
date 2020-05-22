@@ -14,9 +14,9 @@ Stop nifi server
 ```    
 ---
 
-Once started, open webapp in browser at localhost:8080
+Once started, open webapp in browser at localhost:8080/nifi
 
-Add new template from Operator box on left
+Upload your template from Operator box on left
 
 Then drag and drop new template into the main canvas using Template icon
 
