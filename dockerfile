@@ -1,6 +1,4 @@
 FROM apache/nifi
-LABEL maintainer="Arfath Pasha <pashaa@mskcc.org>"
-LABEL maintainer="Doori Rose" <RoseD2@mskcc.org>
 
 USER root
 
