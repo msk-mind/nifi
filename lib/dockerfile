@@ -1,0 +1,35 @@
+FROM openjdk:8-jdk
+LABEL maintainer="Arfath Pasha <pashaa@mskcc.org>"
+
+##
+# Use this dockerfile only to rebuild the nar files in lib
+##
+
+
+# install git
+RUN apt update \
+    && apt-get upgrade -y \
+    && apt install -y git
+
+# install gradle
+RUN wget https://services.gradle.org/distributions/gradle-5.2.1-bin.zip -P /tmp
+RUN unzip -d /opt/gradle /tmp/gradle-*.zip
+#RUN ls /opt/gradle/gradle-5.2.1
+ENV GRADLE_HOME=/opt/gradle/gradle-5.2.1
+ENV PATH=${GRADLE_HOME}/bin:${PATH}
+#RUN touch nano /etc/profile.d/gradle.sh
+#RUN chmod +x /etc/profile.d/gradle.sh
+#RUN source /etc/profile.d/gradle.sh
+# RUN gradle -v
+# RUN which javac
+
+# build nifi-dicom-*.*.nar
+RUN git clone https://github.com/blezek/nifi-dicom.git \
+    && cd nifi-dicom \
+    && ./gradlew nar
+
+
+# keep container running
+CMD tail -f /dev/null
+
+
