@@ -22,4 +22,4 @@ Then drag and drop new template into the main canvas using Template icon
 
 ---
 
-*To add nar libraries to the server, see [nifi_lib](./lib/README.md)*
+*To add nar libraries to the server, see [nifi_lib](./lib/)*
