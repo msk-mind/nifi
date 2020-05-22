@@ -6,7 +6,7 @@ build:
 ## clean nifi container
 make clean:
 	docker stop nifi_ext || true
-	docker rm nifi_ext
+	docker rm nifi_ext || true
 
 ## run nifi container
 run: build clean
