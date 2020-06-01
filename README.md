@@ -14,7 +14,7 @@ Stop nifi server
 ```    
 ---
 
-Once started, open webapp in browser at localhost:8080/nifi
+Once started, open webapp in browser at localhost:8083/nifi
 
 Upload your template from Operator box on left
 
