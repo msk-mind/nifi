@@ -22,7 +22,7 @@ Then drag and drop new template into the main canvas using Template icon
 
 ---
 
-*To add nar libraries to the server, see [nifi_lib](./lib/)*
+*To add or update nar libraries to the server, see [nifi_lib](./lib/)*
 
 
 Reference:
