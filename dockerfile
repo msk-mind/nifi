@@ -6,8 +6,7 @@ USER root
 ## add libs
 COPY lib/nifi-dicom-1.4.nar /opt/nifi/nifi-current/lib/
 # nifi-atlas integration
-COPY lib/nifi-atlas-nar-1.11.0.nar /opt/nifi/nifi-current/lib/
-
+COPY lib/nifi-atlas-nar-1.11.4.nar /opt/nifi/nifi-current/lib/
 
 RUN chown -R nifi:nifi /opt/nifi/nifi-current/lib/
 
