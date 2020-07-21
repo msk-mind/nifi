@@ -14,8 +14,6 @@ run: build clean
 	docker run -d --name nifi_ext -v $(shell pwd)/app:/app \
 	-p 8083:8080 \
 	-p 8082:8082 \
-	-p 8888:8888 \
-	-p 4040:4040 \
-	-p 4041:4041 nifi_ext:latest
+	-p 8888:8888 nifi_ext:latest
 
 
