@@ -14,6 +14,11 @@ COPY lib/nifi-atlas-nar-1.11.4.nar /opt/nifi/nifi-current/lib/
 
 RUN chown -R nifi:nifi /opt/nifi/nifi-current/lib/
 
+## add scripts
+COPY src/* /opt/nifi/nifi-current/src/
+RUN chmod -R +x /opt/nifi/nifi-current/src/
+RUN chown -R nifi:nifi /opt/nifi/nifi-current/src/
+
 
 ## add confs
 # changing some config values in host file may not change values in container file
@@ -28,7 +33,6 @@ COPY conf/atlas-application.properties /opt/nifi/nifi-current/conf/
 # conf files used by HdfsConnection.xml template
 # (https://github.com/msk-mind/etl/blob/master/HdfsConnection.xml)
 COPY conf/core-site.xml /opt/nifi/nifi-current/conf/
-
 COPY conf/hdfs-site.xml /opt/nifi/nifi-current/conf/
 
 
