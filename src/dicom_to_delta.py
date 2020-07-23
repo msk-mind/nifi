@@ -30,8 +30,8 @@ def write_to_delta(spark_master, hdfs_ip ,hdfs_path, delta_table_path):
 			.config("spark.delta.logStore.class", "org.apache.spark.sql.delta.storage.HDFSLogStore") \
 			.config("spark.hadoop.dfs.client.use.datanode.hostname", "true") \
 			.config("spark.driver.host", "127.0.0.1") \
-			.config("spark.driver.port", "8082") \
-			.config("spark.blockManager.port", "8888") \
+			.config("spark.driver.port", "8001") \
+			.config("spark.blockManager.port", "8002") \
 			.config("spark.driver.bindAddress", "0.0.0.0") \
 			.config("spark.cores.max", "6") \
 			.getOrCreate()

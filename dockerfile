@@ -14,12 +14,6 @@ COPY lib/nifi-atlas-nar-1.11.4.nar /opt/nifi/nifi-current/lib/
 
 RUN chown -R nifi:nifi /opt/nifi/nifi-current/lib/
 
-## add scripts
-COPY src/* /opt/nifi/nifi-current/src/
-RUN chmod -R +x /opt/nifi/nifi-current/src/
-RUN chown -R nifi:nifi /opt/nifi/nifi-current/src/
-
-
 ## add confs
 # changing some config values in host file may not change values in container file
 # because start script replaces some values before server launch
