@@ -11,10 +11,11 @@ make clean:
 ## run nifi container
 run: build clean
 	mkdir -p app
+	chmod -R +x $(shell pwd)/src
 	docker run -d --name nifi_ext \
 	 -v $(shell pwd)/app:/app \
+	 -v $(shell pwd)/src:/src \
 	-p 8083:8080 \
-	-p 8082:8082 \
-	-p 8888:8888 nifi_ext:latest
-
+	-p 8001:8001 \
+	-p 8002:8002 nifi_ext:latest
 
