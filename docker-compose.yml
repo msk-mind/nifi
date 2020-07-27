@@ -1,0 +1,13 @@
+version: "3"
+services:
+    nifi:
+        image: nifi_ext:latest
+        ports:
+            - "8083:8080"
+            - "8001:8001"
+            - "8002:8002"
+        volumes:
+            - ./nifi/state:/opt/nifi/nifi-current/state
+            - ./nifi/conf:/opt/nifi/nifi-current/conf
+            - ./app:/app
+            - ./src:/src
