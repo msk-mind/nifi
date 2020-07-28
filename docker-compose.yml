@@ -8,6 +8,5 @@ services:
             - "8002:8002"
         volumes:
             - ./volumes/state:/opt/nifi/nifi-current/state
-            - ./volumes/conf:/opt/nifi/nifi-current/conf
             - ./app:/app
             - ./src:/src
