@@ -30,12 +30,6 @@ def create_delta_table(df, table_name, delta_path, merge, purge):
 			.mode("append") \
 			.save(delta_path)
 
-	# create table in metastore
-	df.repartition(1) \
-		.write \
-		.format("delta") \
-		.mode("overwrite") \
-		.saveAsTable(table_name)
 
 
 def clean_up(spark, table_name, delta_path):
@@ -51,7 +45,6 @@ def clean_up(spark, table_name, delta_path):
 	spark.conf.set("spark.databricks.delta.retentionDurationCheck.enabled", "false")
 	dt.vacuum(0) # vacuum all data
 	
-	spark.sql("DROP TABLE IF EXISTS " + table_name)
 
 
 def write_to_delta(spark_master, hdfs_ip ,hdfs_path, delta_table_path, merge, purge):
