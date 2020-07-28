@@ -1,17 +1,27 @@
 # nifi
 
 
-Start nifi server
+Start nifi server with a clean configuration
     
 ```
     make run
 ```    
+Start nifi server with a presisting configuration
+    
+```
+    docker-compose up -d
+``` 
 
 Stop nifi server
 
 ```
     make clean
 ```    
+or
+
+```
+    docker-compose down
+```  
 ---
 
 Once started, open webapp in browser at localhost:8083/nifi
@@ -56,6 +66,16 @@ For Atlas - NiFi integration
     ```
     atlas.notification.hook.asynchronous=false
     ```
+    
+---
+
+For Presisting the state and configuration
+
+- the initalized conf folder must be copied into the volume 
+    ```
+    docker cp <container id>:/opt/nifi/nifi-current/conf ./volumes/
+    ```
+
 
 
 Reference:
