@@ -10,8 +10,17 @@ clean:
 	docker stop nifi_ext || true
 	docker rm nifi_ext || true
 
+clean-pyc: ## remove Python file artifacts
+	find . -name '*.pyc' -exec rm -f {} +
+	find . -name '*.pyo' -exec rm -f {} +
+	find . -name '*~' -exec rm -f {} +
+	find . -name '__pycache__' -exec rm -fr {} +
+
+clean-test: ## remove test and coverage artifacts
+	rm -fr .pytest_cache
+
 ## run tests quickly with the default Python
-test:
+test: clean-test clean-pyc
 	pytest test
 
 ## run nifi container
