@@ -1,12 +1,18 @@
+.PHONY: all test clean
+
 ## build nifi_ext docker image
 build:
 	docker build -t nifi_ext .
 
 
 ## clean nifi container
-make clean:
+clean:
 	docker stop nifi_ext || true
 	docker rm nifi_ext || true
+
+## run tests quickly with the default Python
+test:
+	pytest test
 
 ## run nifi container
 run: build clean
