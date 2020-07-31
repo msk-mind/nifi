@@ -1,17 +1,15 @@
 import argparse
 from pyspark.sql import SparkSession
 
-# Run Script: python3 dicom_to_delta.py--spark <spark_master_ip> --hdfs <hdfs_ip> --read <hdfs_path> --write <delta_table_path>
+# Run Script: python3 dicom_to_delta.py--spark <spark_master> --hdfs <hdfs_ip> --read <hdfs_path> --write <delta_table_path>
 class DicomToDelta:
 
-	def __init__(self, spark_master_ip):
+	def __init__(self, spark_master_uri):
 
-		# Setup spark context
-		master_uri = "spark://" + spark_master + ":7077"
-
+		# Setup spark session
 		self.spark = SparkSession.builder \
 				.appName("dicom-to-delta") \
-				.master(master_uri) \
+				.master(spark_master_uri) \
 				.config("spark.jars.packages", "io.delta:delta-core_2.12:0.7.0") \
 				.config("spark.delta.logStore.class", "org.apache.spark.sql.delta.storage.HDFSLogStore") \
 			    .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension") \
@@ -19,6 +17,7 @@ class DicomToDelta:
 				.config("spark.hadoop.dfs.client.use.datanode.hostname", "true") \
 				.config("spark.driver.port", "8001") \
 				.config("spark.blockManager.port", "8002") \
+				.config("spark.driver.host", "127.0.0.1") \
 				.config("spark.driver.bindAddress", "0.0.0.0") \
 				.getOrCreate()
 
@@ -58,7 +57,7 @@ class DicomToDelta:
 		"""
 		from delta.tables import DeltaTable
 
-		dt = DeltaTable.forPath(spark, delta_path)
+		dt = DeltaTable.forPath(self.spark, delta_path)
 		# delete latest version
 		dt.delete()
 		# Disable check for retention - default 136 hours (7 days)
@@ -101,23 +100,21 @@ class DicomToDelta:
 
 		# clean up the latest delta table version
 		if purge:
-			clean_up(spark, binary_table, binary_delta_path)
-			clean_up(spark, dcm_table, dcm_delta_path)
-			clean_up(spark, op_table, op_delta_path)
+			self.clean_up(binary_table, binary_delta_path)
+			self.clean_up(dcm_table, dcm_delta_path)
+			self.clean_up(op_table, op_delta_path)
 
 		# Create Delta tables
 		self.spark.sql("CREATE DATABASE IF NOT EXISTS radiology")
-		create_delta_table(binary_df, binary_table, binary_delta_path, merge, purge)
-		create_delta_table(dcm_df, dcm_table, dcm_delta_path, merge, purge)
-		create_delta_table(op_df, op_table, op_delta_path, merge, purge)
-
-		self.spark.stop()
+		self.create_delta_table(binary_df, binary_table, binary_delta_path, merge, purge)
+		self.create_delta_table(dcm_df, dcm_table, dcm_delta_path, merge, purge)
+		self.create_delta_table(op_df, op_table, op_delta_path, merge, purge)
 
 
 if __name__ == '__main__':
 
 	parser = argparse.ArgumentParser(description='Create proxy tables from Dicom parquet files.')
-	parser.add_argument('--spark', type=str, required=True, help='Spark master IP')
+	parser.add_argument('--spark', type=str, required=True, help='Spark master string e.g. spark://master_ip:7077')
 	parser.add_argument('--hdfs', type=str, required=True, help='HDFS IP')
 	parser.add_argument('--read', type=str, required=True, help='Parquet file directory to read from')
 	parser.add_argument('--write', type=str, required=True, help='Delta table write directory')

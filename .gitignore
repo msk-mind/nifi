@@ -3,3 +3,4 @@ app/
 volumes/
 */__pycache__/
 */*.pyc
+env/
