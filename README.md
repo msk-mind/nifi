@@ -76,8 +76,26 @@ For Presisting the state and configuration
     docker cp <container id>:/opt/nifi/nifi-current/conf ./volumes/
     ```
 
+## Python scripts and tests
 
+- **src**: scripts that get called from nifi pipelines.
+- **test**: unit tests for the scripts in `src`.
 
-Reference:
+To run tests, setup a virtual env.
+```
+python3 -m venv env
+source env/bin/activate
+pip install -r requirements.txt
+```
+
+Then run the tests in the virtual env.
+```
+cd test
+pytest
+```
+
+Use ```pytest -s -v``` for details.
+
+## Reference:
 
 Base nifi docker image docs - https://hub.docker.com/r/apache/nifi/

@@ -1,2 +1,4 @@
+pyspark==3.0.0
 pytest==3.8.2
 pytest-runner==4.2
+
