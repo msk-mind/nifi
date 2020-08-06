@@ -91,8 +91,8 @@ class DicomToDelta:
 			.load(binary_path)
 
 		# Read parquet files
-		dcm_df = self.spark.read.parquet(op_path)
-		op_df = self.spark.read.parquet(dcm_path)
+		dcm_df = self.spark.read.parquet(dcm_path)
+		op_df = self.spark.read.parquet(op_path)
 
 		# To improve read performance when you load data back, Databricks recommends 
 		# turning off compression when you save data loaded from binary files:
