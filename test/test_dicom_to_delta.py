@@ -3,15 +3,18 @@
 
 """Tests for `nifi` package."""
 
-import logging
 import pytest
+from click.testing import CliRunner
+
 import sys
 sys.path.append('../src')
 
-from dicom_to_delta import DicomToDelta
+from dicom_to_delta import write_to_delta
+from spark_session import *
 from pyspark.sql import SparkSession
 
-d2d = DicomToDelta("local[*]")
+SPARK = "local[*]"
+DRIVER = "127.0.0.1"
 HDFS_IP = "sandbox-hdp.hortonworks.com" # map to your hdfs in /etc/hosts
 HDFS_PATH = "/db/test/"
 DELTA_TABLE_PATH = "/tmp/dicom_proxy/"
@@ -20,33 +23,30 @@ BINARY_TABLE = "".join(("hdfs://", HDFS_IP, ":8020/", DELTA_TABLE_PATH, "radiolo
 DCM_TABLE = "".join(("hdfs://", HDFS_IP, ":8020/", DELTA_TABLE_PATH, "radiology.dcm"))
 OP_TABLE = "".join(("hdfs://", HDFS_IP, ":8020/", DELTA_TABLE_PATH, "radiology.dcm_op"))
 
-from delta.tables import DeltaTable
+runner = CliRunner()
+
 
 def test_write_to_delta():
 	
-	d2d.write_to_delta(HDFS_IP ,HDFS_PATH, DELTA_TABLE_PATH, False, False)
+	result = runner.invoke(write_to_delta, 
+		['-s',SPARK, '-d',DRIVER, '-h',HDFS_IP, '-r',HDFS_PATH, '-w',DELTA_TABLE_PATH, '-m',False, '-p',False])
 
-	# read delta table
-	dt = DeltaTable.forPath(d2d.spark, DCM_TABLE)
-	assert dt.toDF().count() >= 14
-
+	assert result.exit_code == 0
+	assert result.exception == None
 
 def test_write_to_delta_merge():
-	
-	d2d.write_to_delta(HDFS_IP ,HDFS_PATH, DELTA_TABLE_PATH, True, False)
 
-	# read delta table
-	dt = DeltaTable.forPath(d2d.spark, OP_TABLE)
-	assert dt.toDF().count() >= 14
+	result = runner.invoke(write_to_delta,
+		['-s',SPARK, '-d',DRIVER, '-h',HDFS_IP, '-r',HDFS_PATH, '-w',DELTA_TABLE_PATH, '-m',True, '-p',False])
+
+	assert result.exit_code == 0
+	assert result.exception == None
 
 
 def test_write_to_delta_purge():
 	
-	d2d.write_to_delta(HDFS_IP ,HDFS_PATH, DELTA_TABLE_PATH, False, True)
+	result = runner.invoke(write_to_delta,
+		['-s',SPARK, '-d',DRIVER, '-h',HDFS_IP, '-r',HDFS_PATH, '-w',DELTA_TABLE_PATH, '-m',False, '-p',True])
 
-	# read delta table
-	dcm = DeltaTable.forPath(d2d.spark, DCM_TABLE)
-	assert dcm.toDF().count() == 14
-
-	op = DeltaTable.forPath(d2d.spark, OP_TABLE)
-	assert op.toDF().count() == 14
+	assert result.exit_code == 0
+	assert result.exception == None
