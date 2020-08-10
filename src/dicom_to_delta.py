@@ -2,13 +2,26 @@ import click
 from pyspark.sql import SparkSession
 from spark_session import *
 
+# Run Script: python3 dicom_to_delta.py -s <spark_master> -h <hdfs> -r <hdfs_path> -w <delta_table_path>
 
-# Run Script: python3 dicom_to_delta.py--spark <spark_master> --hdfs <hdfs_ip> --read <hdfs_path> --write <delta_table_path>
-
-def create_delta_table(spark, df, table_name, delta_path, merge, purge):
+def create_delta_table(df, table_name, delta_path, merge, purge):
 	"""
 	Create delta table from the dataframe.
 	"""
+	# TODO repartition # based on the number of rows/performance
+	# TODO upsert - do we still need merge?
+	#   dcm: update on match AccessionNumber|AcquisitionNumber|SeriesNumber|InstanceNumber, otherwise insert
+	#   binary: ...later for when we embed it in parquet
+	#   op: update on match filename, otherwise insert
+
+	if purge:
+		# Changing a column's type or name or dropping a column requires rewriting the table.
+		df.repartition(1) \
+			.write \
+			.format("delta") \
+			.option("overwriteSchema", "true") \
+			.mode("overwrite") \
+			.save(delta_path)
 	if merge:
 		# Adding new columns can be achived with .option("mergeSchema", "true")
 		df.repartition(1) \
@@ -17,14 +30,7 @@ def create_delta_table(spark, df, table_name, delta_path, merge, purge):
 			.option("mergeSchema", "true") \
 			.mode("append") \
 			.save(delta_path)
-	elif purge:
-		# Changing a column's type or name or dropping a column requires rewriting the table.
-		df.repartition(1) \
-			.write \
-			.format("delta") \
-			.option("overwriteSchema", "true") \
-			.mode("append") \
-			.save(delta_path)
+
 	else:
 		df.repartition(1) \
 			.write \
@@ -51,20 +57,28 @@ def remove_delta_table(spark, table_name, delta_path):
 @click.command()
 @click.option("-s", "--spark", required=True, help="Spark master string e.g. spark://master_ip:7077")
 @click.option("-d", "--driver", default="127.0.0.1", show_default=True, help="Driver Host IP")
-@click.option("-h", "--hdfs", required=True, help="HDFS IP")
+@click.option("-h", "--hdfs", default="hdfs://sandbox-hdp.hortonworks.com:8020/", show_default=True, help="HDFS uri e.g. hdfs://sandbox-hdp.hortonworks.com:8020/")
 @click.option("-r", "--read", required=True, help="Parquet file directory to read from")
 @click.option("-w", "--write", required=True, help="Delta table write directory")
-@click.option("-m", "--merge", type=bool, default=False, show_default=True, help="(optional) Merge schema - add new columns")
-@click.option("-p", "--purge", type=bool, default=False, show_default=True, help="(optional) Delete all delta tables - then create new tables")
-def write_to_delta(spark, driver, hdfs ,read, write, merge, purge):
+# Note: use with caution. Either use merge or purge, not both.
+@click.option("-m", "--merge", is_flag=True, default=False, show_default=True, help="(optional) Merge schema - add new columns")
+@click.option("-p", "--purge", is_flag=True, default=False, show_default=True, help="(optional) Delete all delta tables - then create new tables")
+def cli(spark, driver, hdfs ,read, write, merge, purge):
+	"""
+	Main CLI - setup spark session and call write to delta.
+	"""
+	sc = SparkConfig()
+	spark_session = sc.spark_session(spark, driver)
+
+	write_to_delta(spark_session, hdfs ,read, write, merge, purge)
+
+
+def write_to_delta(spark, hdfs ,read, write, merge, purge):
 	"""
 	Create proxy tables from Dicom parquet files
 	"""
-
-	spark = spark_session(spark, driver)
-
 	# input file path
-	common_hdfs_path = "".join(("hdfs://", hdfs, ":8020/", read))
+	common_hdfs_path = hdfs + read
 	binary_path = common_hdfs_path + "/dicom"
 	dcm_path = common_hdfs_path + "/parquet/*.dicom.parquet"
 	op_path = common_hdfs_path + "/parquet/*.metadata.parquet"
@@ -75,7 +89,7 @@ def write_to_delta(spark, driver, hdfs ,read, write, merge, purge):
 	op_table = "radiology.dcm_op"
 
 	# output delta table path
-	common_delta_path = "".join(("hdfs://", hdfs, ":8020/", write, "/"))
+	common_delta_path = "".join((hdfs, write, "/"))
 	binary_delta_path = common_delta_path + binary_table
 	dcm_delta_path = common_delta_path + dcm_table
 	op_delta_path = common_delta_path + op_table
@@ -102,11 +116,11 @@ def write_to_delta(spark, driver, hdfs ,read, write, merge, purge):
 
 	# Create Delta tables
 	spark.sql("CREATE DATABASE IF NOT EXISTS radiology")
-	create_delta_table(spark, binary_df, binary_table, binary_delta_path, merge, purge)
-	create_delta_table(spark, dcm_df, dcm_table, dcm_delta_path, merge, purge)
-	create_delta_table(spark, op_df, op_table, op_delta_path, merge, purge)
+	create_delta_table(binary_df, binary_table, binary_delta_path, merge, purge)
+	create_delta_table(dcm_df, dcm_table, dcm_delta_path, merge, purge)
+	create_delta_table(op_df, op_table, op_delta_path, merge, purge)
 
 
 if __name__ == '__main__':
-	write_to_delta()
+	cli()
 
