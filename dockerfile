@@ -5,7 +5,7 @@ USER root
 RUN apt-get update \
     && apt-get install -y python3 python3-pip
 
-RUN python3 -m pip install pyspark
+RUN python3 -m pip install pyspark click
 
 ## add libs
 COPY lib/nifi-dicom-1.4.nar /opt/nifi/nifi-current/lib/
