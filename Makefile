@@ -1,11 +1,33 @@
 .PHONY: all help build clean test run
+.DEFAULT_GOAL := help
 
+define BROWSER_PYSCRIPT
+import os, webbrowser, sys
+
+try:
+	from urllib import pathname2url
+except:
+	from urllib.request import pathname2url
+
+webbrowser.open("file://" + pathname2url(os.path.abspath(sys.argv[1])))
+endef
+export BROWSER_PYSCRIPT
+
+define PRINT_HELP_PYSCRIPT
+import re, sys
+
+for line in sys.stdin:
+	match = re.match(r'^([a-zA-Z_-]+):.*?## (.*)$$', line)
+	if match:
+		target, help = match.groups()
+		print("%-20s %s" % (target, help))
+endef
+export PRINT_HELP_PYSCRIPT
+
+BROWSER := python -c "$$BROWSER_PYSCRIPT"
 
 help:
-	@echo 'Usage: make <target>'
-	@echo
-	@fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##//'
-
+	@python -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
 
 build:      ## build nifi_ext docker image
 	docker build -t nifi_ext .
@@ -25,11 +47,20 @@ clean-pyc:      ## remove Python file artifacts
 
 clean-test:      ## remove test and coverage artifacts
 	rm -fr .pytest_cache
+	rm -fr .tox/
+	rm -f .coverage
+	rm -fr htmlcov/
 
 
-test: clean-test clean-pyc      ## run tests with the default Python
+test: clean-test clean-pyc      ## run tests quickly with the default Python
 	pytest test
 
+
+coverage:      ## check code coverage quickly with the default Python
+	coverage run --source src -m pytest
+	coverage report -m
+	coverage html
+	$(BROWSER) htmlcov/index.html
 
 run: build clean      ## launch nifi container
 	mkdir -p app
