@@ -1,30 +1,37 @@
-.PHONY: all test clean
+.PHONY: all help build clean test run
 
-## build nifi_ext docker image
-build:
+
+help:
+	@echo 'Usage: make <target>'
+	@echo
+	@fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##//'
+
+
+build:      ## build nifi_ext docker image
 	docker build -t nifi_ext .
 
 
-## clean nifi container
-clean:
+clean:      ## stop and delete nifi_ext container
 	docker stop nifi_ext || true
 	docker rm nifi_ext || true
 
-clean-pyc: ## remove Python file artifacts
+
+clean-pyc:      ## remove Python file artifacts
 	find . -name '*.pyc' -exec rm -f {} +
 	find . -name '*.pyo' -exec rm -f {} +
 	find . -name '*~' -exec rm -f {} +
 	find . -name '__pycache__' -exec rm -fr {} +
 
-clean-test: ## remove test and coverage artifacts
+
+clean-test:      ## remove test and coverage artifacts
 	rm -fr .pytest_cache
 
-## run tests quickly with the default Python
-test: clean-test clean-pyc
+
+test: clean-test clean-pyc      ## run tests with the default Python
 	pytest test
 
-## run nifi container
-run: build clean
+
+run: build clean      ## launch nifi container
 	mkdir -p app
 	chmod -R +x $(shell pwd)/src
 	docker run -d --name nifi_ext \
