@@ -53,7 +53,7 @@ clean-test:      ## remove test and coverage artifacts
 
 
 test: clean-test clean-pyc      ## run tests quickly with the default Python
-	pytest test
+	pytest test -s
 
 
 coverage:      ## check code coverage quickly with the default Python
