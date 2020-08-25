@@ -67,6 +67,9 @@ def cli(spark, driver, hdfs ,read, write, merge, purge):
 	"""
 	Main CLI - setup spark session and call write to delta.
 	"""
+	if merge and purge:
+		raise ValueError("Cannot use flags merge and purge at the same time!")
+
 	sc = SparkConfig()
 	spark_session = sc.spark_session(spark, driver)
 
