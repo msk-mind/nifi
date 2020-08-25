@@ -60,12 +60,22 @@ class TestDicomToDelta(TestCase):
 		assert 1 == self.mock_spark.sql.call_count
 		assert 4 == self.mock_spark.conf.set.call_count
 
-	def test_cli(self):
+
+	def test_cli_missing_required_param(self):
 
 		runner = CliRunner()
 
 		result = runner.invoke(cli, ["-d", DRIVER, "-h", HDFS, "-r", HDFS_PATH, "-w", DELTA_TABLE_PATH])
 
 		assert 2 == result.exit_code
+		assert None != result.exception
+
+	def test_cli_merge_and_purge(self):
+
+		runner = CliRunner()
+
+		result = runner.invoke(cli, ["-s", SPARK, "-d", DRIVER, "-h", HDFS, "-r", HDFS_PATH, "-w", DELTA_TABLE_PATH, "--merge", "--purge"])
+
+		assert 1 == result.exit_code
 		assert None != result.exception
 
