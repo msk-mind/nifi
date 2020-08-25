@@ -3,4 +3,5 @@ app/
 volumes/
 */__pycache__/
 */*.pyc
+*.coverage
 env/
