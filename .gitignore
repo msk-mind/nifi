@@ -1,7 +1,8 @@
-.DS_Store/
+*.DS_Store/
 app/
 volumes/
 */__pycache__/
 */*.pyc
 *.coverage
 env/
+test/testdata/proxytable/
