@@ -1,6 +1,7 @@
 import click
 from pyspark.sql import SparkSession
 from spark_session import *
+import re
 
 # Run Script: python3 dicom_to_delta.py -s <spark_master> -h <hdfs> -r <hdfs_path> -w <delta_table_path>
 
@@ -16,7 +17,7 @@ def create_delta_table(df, table_name, delta_path, merge, purge):
 
 	if purge:
 		# Changing a column's type or name or dropping a column requires rewriting the table.
-		df.coalesce(1) \
+		df.coalesce(128) \
 			.write \
 			.format("delta") \
 			.option("overwriteSchema", "true") \
@@ -24,7 +25,7 @@ def create_delta_table(df, table_name, delta_path, merge, purge):
 			.save(delta_path)
 	if merge:
 		# Adding new columns can be achived with .option("mergeSchema", "true")
-		df.coalesce(1) \
+		df.coalesce(128) \
 			.write \
 			.format("delta") \
 			.option("mergeSchema", "true") \
@@ -32,7 +33,7 @@ def create_delta_table(df, table_name, delta_path, merge, purge):
 			.save(delta_path)
 
 	else:
-		df.coalesce(1) \
+		df.coalesce(128) \
 			.write \
 			.format("delta") \
 			.mode("append") \
@@ -120,7 +121,10 @@ def write_to_delta(spark, hdfs ,read, write, merge, purge):
 	# Create Delta tables
 	create_delta_table(binary_df, binary_table, binary_delta_path, merge, purge)
 	create_delta_table(dcm_df, dcm_table, dcm_delta_path, merge, purge)
-	create_delta_table(op_df, op_table, op_delta_path, merge, purge)
+
+	# Filter duplicate attributes created in nifi that endswith _#
+	dcm_op = op_df.drop(*filter(lambda col: re.search(r'_\d', col), op_df.columns))
+	create_delta_table(dcm_op, op_table, op_delta_path, merge, purge)
 
 
 if __name__ == '__main__':
