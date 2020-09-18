@@ -41,15 +41,14 @@ def create_delta_table(df, table_name, delta_path, merge, purge):
 
 
 
-def remove_delta_table(spark, table_name, delta_path):
+def remove_delta_table(spark, delta_path):
 	"""
 	Clean up an existing delta table.
 	"""
 	from delta.tables import DeltaTable
 
 	dt = DeltaTable.forPath(spark, delta_path)
-	# delete latest version
-	dt.delete()
+
 	# Disable check for retention - default 136 hours (7 days)
 	spark.conf.set("spark.databricks.delta.retentionDurationCheck.enabled", "false")
 	dt.vacuum(0) # vacuum all data
@@ -62,9 +61,10 @@ def remove_delta_table(spark, table_name, delta_path):
 @click.option("-r", "--read", required=True, help="Parquet file directory to read from")
 @click.option("-w", "--write", required=True, help="Delta table write directory")
 # Note: use with caution. Either use merge or purge, not both.
+@click.option("-f", "--fs", is_flag=True, default=False, show_default=True, help="(optional) use local filesystem or hdfs")
 @click.option("-m", "--merge", is_flag=True, default=False, show_default=True, help="(optional) Merge schema - add new columns")
 @click.option("-p", "--purge", is_flag=True, default=False, show_default=True, help="(optional) Delete all delta tables - then create new tables")
-def cli(spark, driver, hdfs ,read, write, merge, purge):
+def cli(spark, driver, hdfs ,read, write, fs, merge, purge):
 	"""
 	Main CLI - setup spark session and call write to delta.
 	"""
@@ -72,7 +72,7 @@ def cli(spark, driver, hdfs ,read, write, merge, purge):
 		raise ValueError("Cannot use flags merge and purge at the same time!")
 
 	sc = SparkConfig()
-	spark_session = sc.spark_session(spark, driver)
+	spark_session = sc.spark_session(spark, driver, fs)
 
 	write_to_delta(spark_session, hdfs ,read, write, merge, purge)
 
@@ -114,12 +114,11 @@ def write_to_delta(spark, hdfs ,read, write, merge, purge):
 
 	# clean up the latest delta table version
 	if purge:
-		remove_delta_table(spark, binary_table, binary_delta_path)
-		remove_delta_table(spark, dcm_table, dcm_delta_path)
-		remove_delta_table(spark, op_table, op_delta_path)
+		remove_delta_table(spark, binary_delta_path)
+		remove_delta_table(spark, dcm_delta_path)
+		remove_delta_table(spark, op_delta_path)
 
 	# Create Delta tables
-	spark.sql("CREATE DATABASE IF NOT EXISTS radiology")
 	create_delta_table(binary_df, binary_table, binary_delta_path, merge, purge)
 	create_delta_table(dcm_df, dcm_table, dcm_delta_path, merge, purge)
 
