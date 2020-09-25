@@ -5,7 +5,7 @@ This repo contains:
 - NiFi docker setup
 - a Spark script that gets kicked off as one of our ETL pipelines.
 
-## How To Use
+## Getting Started
 
 Start the nifi container with a clean configuration:
 ```
@@ -30,7 +30,7 @@ Once started, access the webapp at localhost:8083/nifi
 
 ---
 
-## Additional NARs:
+## Additional NARs
 
 To add or update nar libraries to the server, see [nifi_lib](./lib/)
 
