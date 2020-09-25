@@ -1,50 +1,55 @@
 # nifi
 
+This repo contains:
 
-Start nifi server with a clean configuration
-    
+- NiFi docker setup
+- a Spark script that gets kicked off as one of our ETL pipelines.
+
+## How To Use
+
+Start the nifi container with a clean configuration:
 ```
     make run
-```    
-Start nifi server with a presisting configuration
-    
 ```
-    docker-compose up -d
-``` 
-
-Stop nifi server
+Stop the nifi container:
 
 ```
     make clean
 ```    
-or
 
+
+Start the nifi container with a persisting configuration:
+```
+    docker-compose up -d
+``` 
+Stop the nifi container:
 ```
     docker-compose down
 ```  
----
-
-Once started, open webapp in browser at localhost:8083/nifi
-
-Upload your template from Operator box on left
-
-Then drag and drop new template into the main canvas using Template icon
+Once started, access the webapp at localhost:8083/nifi
 
 ---
 
-*To add or update nar libraries to the server, see [nifi_lib](./lib/)*
+## Additional NARs:
+
+To add or update nar libraries to the server, see [nifi_lib](./lib/)
 
 ---
 
-For connecting to HDFS
+## Configuration
+
+Configuration files are in the [conf](./conf/) directory.
+
+For connecting to HDFS, we need to copy configuration files from HDFS.
 
 - hdfs-site.xml : downloaded from sandbox HDP && added dfs.client.use.datanode.hostname property
 - core-site.xml : downloaded from sandbox HDP
-- add your HDP ip to nifi vm.
+
+Then add your HDP ip address mapping to the nifi container.
 ```
 docker exec -u 0 nifi_ext /bin/sh -c "echo '<ip> sandbox-hdp.hortonworks.com' >> /etc/hosts"
 ```
-*Note*: if sandbox-hdp is running in a different docker, ip can be found by running:
+*Note*: if sandbox-hdp is running in a different docker container, the ip address can be found by running:
 ```
 docker inspect sandbox-hdp | grep Gateway
 ```
@@ -69,7 +74,7 @@ For Atlas - NiFi integration
     
 ---
 
-For Presisting the state and configuration
+For Persisting the state and configuration
 
 - the initalized conf folder must be copied into the volume 
     ```
