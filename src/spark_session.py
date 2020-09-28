@@ -4,7 +4,7 @@ from pyspark.sql import SparkSession
 
 class SparkConfig:
 
-	def spark_session(self, spark_master_uri, driver_ip, fs):
+	def spark_session(self, spark_master_uri, driver_ip, fs=False):
 
 		default_fs = "hdfs:///"
 		if fs:
