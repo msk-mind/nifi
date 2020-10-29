@@ -1,7 +1,7 @@
 import click
 from pyspark.sql import SparkSession
 from spark_session import *
-import re
+import re, os
 
 # Run Script: python3 dicom_to_delta.py -s <spark_master> -h <hdfs> -r <hdfs_path> -w <delta_table_path>
 

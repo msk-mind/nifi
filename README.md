@@ -21,7 +21,7 @@ Stop the nifi container:
 Start the nifi container with a persisting configuration:
 ```
     docker-compose up -d
-``` 
+```
 Stop the nifi container:
 ```
     docker-compose down
@@ -57,7 +57,7 @@ docker inspect sandbox-hdp | grep Gateway
 
 For JVM memory setting
 
-- bootstrap.conf : Download from Sandbox HDP and modify the properties 
+- bootstrap.conf : Download from Sandbox HDP and modify the properties
     ```
     java.arg.2=-Xms4g
     java.arg.3=-Xmx4g
@@ -71,12 +71,12 @@ For Atlas - NiFi integration
     ```
     atlas.notification.hook.asynchronous=false
     ```
-    
+
 ---
 
 For Persisting the state and configuration
 
-- the initalized conf folder must be copied into the volume 
+- the initalized conf folder must be copied into the volume
     ```
     docker cp <container id>:/opt/nifi/nifi-current/conf ./volumes/
     ```
@@ -93,9 +93,8 @@ source env/bin/activate
 pip install -r requirements.txt
 ```
 
-Then run the tests in the virtual env.
+Then run the tests in the virtual env from the main /nifi directory.
 ```
-cd test
 pytest
 ```
 
