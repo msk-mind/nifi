@@ -3,7 +3,7 @@ from pyspark.sql import SparkSession
 from spark_session import *
 import re, os
 
-# Run Script: python3 dicom_to_delta.py -s <spark_master> -h <hdfs> -r <hdfs_path> -w <delta_table_path>
+# Run Script: python3 dicom_to_delta.py -s <spark_master> -h <hdfs> -a <radiology_dataset_path>
 
 def create_delta_table(df, table_name, delta_path, merge, purge):
 	"""
