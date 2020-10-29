@@ -58,7 +58,7 @@ def remove_delta_table(spark, delta_path):
 @click.option("-s", "--spark", required=True, help="Spark master string e.g. spark://master_ip:7077")
 @click.option("-d", "--driver", default="127.0.0.1", show_default=True, help="Driver Host IP")
 @click.option("-h", "--hdfs", default="hdfs://sandbox-hdp.hortonworks.com:8020/", show_default=True, help="HDFS uri e.g. hdfs://sandbox-hdp.hortonworks.com:8020/")
-@click.option("-a", "--dataset_address", required=True, help= "path to dataset directory containing parquet/ and dicom/ directories. This path is the directory for which the new delta table directory /tables is created under")
+@click.option("-a", "--dataset_address", required=True, help= "path to dataset directory containing parquet/ and dicom/ directories. This path is the directory for which the new delta table directory /table is created under")
 # Note: use with caution. Either use merge or purge, not both.
 @click.option("-f", "--fs", is_flag=True, default=False, show_default=True, help="(optional) use local filesystem or hdfs")
 @click.option("-m", "--merge", is_flag=True, default=False, show_default=True, help="(optional) Merge schema - add new columns")
