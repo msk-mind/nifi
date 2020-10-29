@@ -91,8 +91,8 @@ def write_to_delta(spark, hdfs , dataset_address, merge, purge):
 	dcm_path = os.path.join(dataset_address, "parquet/*.dicom.parquet")
 
 	# output delta table names:
-	binary_table = "radiology.dcm_binary"
-	dcm_table = "radiology.dcm"
+	binary_table = "dicom_binary"
+	dcm_table = "dicom"
 
 	# output delta table paths
 	common_delta_path = os.path.join(dataset_address, "table")
