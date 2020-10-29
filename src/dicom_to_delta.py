@@ -82,14 +82,14 @@ def write_to_delta(spark, hdfs , dataset_address, merge, purge):
 	"""
 
 	# form dataset addresss (contains /parquet, /table, /dicom, and dataset yaml)
-	dataset_address = os.path.join(hdfs, dataset_address)
+	# in case dataset_address is an absolute path, we use + instead of os.path.join
+	dataset_address = hdfs + "/" + dataset_address
 
 	# input parquet file paths:
 	# path to dicom binary parquet
 	binary_path = os.path.join(dataset_address, "dicom")
 	# path to parquet containing dicom headers and op metadata
-	dcm_path = os.path.join(dataset_address, "parquet/*.dicom.parquet")
-
+	dcm_path = os.path.join(dataset_address, "parquet")
 	# output delta table names:
 	binary_table = "dicom_binary"
 	dcm_table = "dicom"
