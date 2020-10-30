@@ -81,7 +81,9 @@ For Persisting the state and configuration
     docker cp <container id>:/opt/nifi/nifi-current/conf ./volumes/
     ```
 
-## Python scripts and tests
+## Python scripts and tests (Old)
+
+This functionality is being moved to data-processing.
 
 - **src**: scripts that get called from nifi pipelines.
 - **test**: unit tests for the scripts in `src`.
