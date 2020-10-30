@@ -37,31 +37,6 @@ clean:      ## stop and delete nifi_ext container
 	docker stop nifi_ext || true
 	docker rm nifi_ext || true
 
-
-clean-pyc:      ## remove Python file artifacts
-	find . -name '*.pyc' -exec rm -f {} +
-	find . -name '*.pyo' -exec rm -f {} +
-	find . -name '*~' -exec rm -f {} +
-	find . -name '__pycache__' -exec rm -fr {} +
-
-
-clean-test:      ## remove test and coverage artifacts
-	rm -fr .pytest_cache
-	rm -fr .tox/
-	rm -f .coverage
-	rm -fr htmlcov/
-
-
-test: clean-test clean-pyc      ## run tests quickly with the default Python
-	pytest tests -s
-
-
-coverage:      ## check code coverage quickly with the default Python
-	coverage run --source src -m pytest
-	coverage report -m
-	coverage html
-	$(BROWSER) htmlcov/index.html
-
 run: build clean      ## launch nifi container
 	mkdir -p app
 	chmod -R +x $(shell pwd)/src
