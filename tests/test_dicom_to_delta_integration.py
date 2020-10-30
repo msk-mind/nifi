@@ -21,13 +21,12 @@ from pyspark.sql import SparkSession
 SPARK = "local[2]"
 DRIVER = "127.0.0.1"
 HDFS = "" # use local fs
-HDFS_PATH = "./tests/testdata/"
-DELTA_TABLE_PATH = "./tests/testdata/proxytable"
+DATASET_ADDRESS = "./tests/testdata/test_dataset_address"
+DELTA_TABLE_PATH = os.path.join(DATASET_ADDRESS, "table")
 
-BINARY_TABLE = os.path.join(DELTA_TABLE_PATH, "radiology.dcm_binary")
-DCM_TABLE = os.path.join(DELTA_TABLE_PATH, "radiology.dcm")
-OP_TABLE = os.path.join(DELTA_TABLE_PATH, "radiology.dcm_op")
-TABLES = [BINARY_TABLE, DCM_TABLE, OP_TABLE]
+BINARY_TABLE = os.path.join(DELTA_TABLE_PATH, "dicom_binary")
+DCM_TABLE = os.path.join(DELTA_TABLE_PATH, "dicom")
+TABLES = [BINARY_TABLE, DCM_TABLE]
 
 
 @pytest.fixture(autouse=True)
@@ -37,25 +36,24 @@ def spark():
     yield spark
 
     print('------teardown------')
-    if os.path.exists(DELTA_TABLE_PATH):
-        shutil.rmtree(DELTA_TABLE_PATH)
-
+    for table_path in TABLES:
+        if os.path.exists(table_path):
+            shutil.rmtree(table_path)
 
 def assertions(spark):
-	for table in TABLES:
-		df = spark.read.format("delta").load(table)
-		assert 3 == df.count()
+    for table in TABLES:
+        df = spark.read.format("delta").load(table)
+        assert 3 == df.count()
 
 
 def test_write_to_delta(spark):
 
-	write_to_delta(spark, HDFS, HDFS_PATH, DELTA_TABLE_PATH, False, False)
+	write_to_delta(spark, HDFS, DATASET_ADDRESS, False, False)
 	assertions(spark)
 
 
 
 def test_write_to_delta_merge(spark):
 
-	write_to_delta(spark, HDFS, HDFS_PATH, DELTA_TABLE_PATH, True, False)
+	write_to_delta(spark, HDFS, DATASET_ADDRESS, True, False)
 	assertions(spark)
-
