@@ -2,13 +2,6 @@ FROM apache/nifi
 
 USER root
 
-RUN apt-get update \
-    && apt-get install -y python3 python3-pip
-
-# copy requirements for python libraries
-COPY requirements.txt .
-RUN python3 -m pip install -r requirements.txt
-
 ## add libs
 COPY lib/nifi-dicom-1.4.nar /opt/nifi/nifi-current/lib/
 # nifi-atlas integration
@@ -24,7 +17,6 @@ COPY conf/bootstrap.conf /opt/nifi/nifi-current/conf/
 
 # nifi-atlas integration
 COPY conf/atlas-application.properties /opt/nifi/nifi-current/conf/
-
 
 # conf files used by HdfsConnection.xml template
 # (https://github.com/msk-mind/etl/blob/master/HdfsConnection.xml)
